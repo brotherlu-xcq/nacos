@@ -32,7 +32,7 @@
                 <Delelte basePath="${sys:JM.LOG.PATH}/nacos" maxDepth="1">
                     <IfFileName glob="config.log.*">
                         <IfAny>
-                            <IfLastModified age="${sys:JM.LOG.RETAIN.DAY:-30d}"/>
+                            <IfLastModified age="${sys:JM.LOG.RETAIN.DAY:-30}d"/>
                             <IfAccumulatedFileSize exceeds="${sys:JM.LOG.RETAIN.SIZE:-5GB}"/>
                         </IfAny>
                     </IfFileName>
