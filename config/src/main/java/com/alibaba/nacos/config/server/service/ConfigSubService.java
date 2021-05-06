@@ -106,9 +106,7 @@ public class ConfigSubService {
                         LogUtil.DEFAULT_LOG.warn("The task in ip: {}  did not completed in 1000ms ", member);
                     }
                 } catch (TimeoutException e) {
-                    if (f != null) {
-                        f.cancel(true);
-                    }
+                    f.cancel(true);
                     LogUtil.DEFAULT_LOG.warn("get task result with TimeoutException: {} ", e.getMessage());
                 }
             } catch (InterruptedException e) {
@@ -212,9 +210,7 @@ public class ConfigSubService {
         SampleResult sampleCollectResult = new SampleResult();
         for (int i = 0; i < sampleTime; i++) {
             List<SampleResult> sampleResults = runCollectionJob(url, params, completionService, resultList);
-            if (sampleResults != null) {
-                sampleCollectResult = mergeSampleResult(sampleCollectResult, sampleResults);
-            }
+            sampleCollectResult = mergeSampleResult(sampleCollectResult, sampleResults);
         }
         return sampleCollectResult;
     }
@@ -232,9 +228,7 @@ public class ConfigSubService {
         SampleResult sampleCollectResult = new SampleResult();
         for (int i = 0; i < sampleTime; i++) {
             List<SampleResult> sampleResults = runCollectionJob(url, params, completionService, resultList);
-            if (sampleResults != null) {
-                sampleCollectResult = mergeSampleResult(sampleCollectResult, sampleResults);
-            }
+            sampleCollectResult = mergeSampleResult(sampleCollectResult, sampleResults);
         }
         return sampleCollectResult;
     }

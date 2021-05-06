@@ -83,8 +83,7 @@ public class NotifySingleService {
                 LogUtil.NOTIFY_LOG
                         .error("[notify-exception] target:{} dataid:{} group:{} ts:{}", target, getDataId(), getGroup(),
                                 getLastModified());
-                LogUtil.NOTIFY_LOG.debug("[notify-exception] target:{} dataid:{} group:{} ts:{}",
-                        new Object[] {target, getDataId(), getGroup(), getLastModified()}, e);
+                LogUtil.NOTIFY_LOG.debug("[notify-exception] target:{} dataid:{} group:{} ts:{}", target, getDataId(), getGroup(), getLastModified(), e);
             }
             
             if (!this.isSuccess) {
