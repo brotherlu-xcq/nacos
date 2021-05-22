@@ -36,10 +36,12 @@ public class VersionUtils {
      */
     public static final String VERSION_PLACEHOLDER = "${project.version}";
     
+    private static final String NACOS_VERSION_FILE = "nacos-version.txt";
+    
     static {
         InputStream in = null;
         try {
-            in = VersionUtils.class.getClassLoader().getResourceAsStream("nacos-version.txt");
+            in = VersionUtils.class.getClassLoader().getResourceAsStream(NACOS_VERSION_FILE);
             Properties props = new Properties();
             props.load(in);
             String val = props.getProperty("version");
