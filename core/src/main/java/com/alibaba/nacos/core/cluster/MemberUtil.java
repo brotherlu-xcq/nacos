@@ -44,6 +44,12 @@ public class MemberUtil {
     
     protected static final String TARGET_MEMBER_CONNECT_REFUSE_ERRMSG = "Connection refused";
     
+    private static final String SERVER_PORT_PROPERTY = "server.port";
+    
+    private static final int DEFAULT_SERVER_PORT = 8848;
+    
+    private static final int DEFAULT_RAFT_OFFSET_PORT = 1000;
+    
     /**
      * Information copy.
      *
@@ -68,7 +74,7 @@ public class MemberUtil {
     @SuppressWarnings("PMD.UndefineMagicConstantRule")
     public static Member singleParse(String member) {
         // Nacos default port is 8848
-        int defaultPort = EnvUtil.getProperty("server.port", Integer.class, 8848);
+        int defaultPort = EnvUtil.getProperty(SERVER_PORT_PROPERTY, Integer.class, DEFAULT_SERVER_PORT);
         // Set the default Raft port information for securit
         
         String address = member;
@@ -102,7 +108,7 @@ public class MemberUtil {
     }
     
     public static int calculateRaftPort(Member member) {
-        return member.getPort() - 1000;
+        return member.getPort() - DEFAULT_RAFT_OFFSET_PORT;
     }
     
     /**
