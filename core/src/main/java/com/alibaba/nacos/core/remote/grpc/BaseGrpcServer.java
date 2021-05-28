@@ -151,7 +151,7 @@ public abstract class BaseGrpcServer extends BaseRpcServer {
     private int getInboundMessageSize() {
         String messageSize = System
                 .getProperty("nacos.remote.server.grpc.maxinbound.message.size", String.valueOf(10 * 1024 * 1024));
-        return Integer.valueOf(messageSize);
+        return Integer.parseInt(messageSize);
     }
     
     private Channel getInternalChannel(ServerCall serverCall) {
