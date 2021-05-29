@@ -78,6 +78,22 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
      */
     private static final long KEEP_ALIVE_TIME = 20000L;
     
+    /**
+     * connection limit rule.
+     */
+    private ConnectionLimitRule connectionLimitRule = new ConnectionLimitRule();
+    
+    /**
+     * current loader adjust count,only effective once,use to re balance.
+     */
+    private int loadClient = -1;
+    
+    String redirectAddress = null;
+    
+    private Map<String, AtomicInteger> connectionForClientIp = new ConcurrentHashMap<String, AtomicInteger>(16);
+    
+    Map<String, Connection> connections = new ConcurrentHashMap<String, Connection>();
+    
     @Autowired
     private ClientConnectionEventListenerRegistry clientConnectionEventListenerRegistry;
     
@@ -103,25 +119,9 @@ public class ConnectionManager extends Subscriber<ConnectionLimitRuleChangeEvent
             loadRuleFromLocal();
             registerFileWatch();
         } catch (Exception e) {
-            Loggers.REMOTE.warn("Fail to init limit rue from local ,error={} ", e);
+            Loggers.REMOTE.warn("Fail to init limit rue from local ,error= ", e);
         }
     }
-    
-    /**
-     * connection limit rule.
-     */
-    private ConnectionLimitRule connectionLimitRule = new ConnectionLimitRule();
-    
-    /**
-     * current loader adjust count,only effective once,use to re balance.
-     */
-    private int loadClient = -1;
-    
-    String redirectAddress = null;
-    
-    private Map<String, AtomicInteger> connectionForClientIp = new ConcurrentHashMap<String, AtomicInteger>(16);
-    
-    Map<String, Connection> connections = new ConcurrentHashMap<String, Connection>();
     
     /**
      * check connection id is valid.

@@ -284,7 +284,7 @@ public class TpsMonitorPoint {
             Iterator<Map.Entry<String, TpsRecorder>> iteratorCurrent = monitorKeysRecorderCurrent.entrySet().iterator();
             while (iteratorCurrent.hasNext()) {
                 Map.Entry<String, TpsRecorder> next1 = iteratorCurrent.next();
-                if (!newMonitorKeyRules.containsKey(next1.getKey().toString())) {
+                if (!newMonitorKeyRules.containsKey(next1.getKey())) {
                     Loggers.TPS_CONTROL.info("Delete  point  control rule for pointName=[{}] ,monitorKey=[{}]",
                             this.getPointName(), next1.getKey());
                     iteratorCurrent.remove();

@@ -186,7 +186,7 @@ public class Member implements Comparable<Member>, Cloneable, Serializable {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             oos.writeObject(this);
-            //将流序列化成对象
+            // convert the input stream to member object
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
             ObjectInputStream ois = new ObjectInputStream(bais);
             copy = (Member) ois.readObject();

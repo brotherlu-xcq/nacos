@@ -50,6 +50,10 @@ public class MemberUtil {
     
     private static final int DEFAULT_RAFT_OFFSET_PORT = 1000;
     
+    private static final String MEMBER_FAIL_ACCESS_CNT_PROPERTY = "nacos.core.member.fail-access-cnt";
+    
+    private static final int DEFAULT_MEMBER_FAIL_ACCESS_CNT = 3;
+    
     /**
      * Information copy.
      *
@@ -157,7 +161,7 @@ public class MemberUtil {
         final NodeState old = member.getState();
         member.setState(NodeState.SUSPICIOUS);
         member.setFailAccessCnt(member.getFailAccessCnt() + 1);
-        int maxFailAccessCnt = EnvUtil.getProperty("nacos.core.member.fail-access-cnt", Integer.class, 3);
+        int maxFailAccessCnt = EnvUtil.getProperty(MEMBER_FAIL_ACCESS_CNT_PROPERTY, Integer.class, DEFAULT_MEMBER_FAIL_ACCESS_CNT);
         
         // If the number of consecutive failures to access the target node reaches
         // a maximum, or the link request is rejected, the state is directly down

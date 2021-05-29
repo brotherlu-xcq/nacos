@@ -83,6 +83,8 @@ public class AddressServerMemberLookup extends AbstractMemberLookup {
     
     private static final String ADDRESS_SERVER_URL = "address_server_url";
     
+    private static final String ADDRESS_SERVER_RETRY_PROPERTY = "nacos.core.address-server.retry";
+    
     @Override
     public void doStart() throws NacosException {
         this.maxFailCount = Integer.parseInt(EnvUtil.getProperty(HEALTH_CHECK_FAIL_COUNT_PROPERTY, DEFAULT_HEALTH_CHECK_FAIL_COUNT));
@@ -127,7 +129,7 @@ public class AddressServerMemberLookup extends AbstractMemberLookup {
         // Repeat three times, successfully jump out
         boolean success = false;
         Throwable ex = null;
-        int maxRetry = EnvUtil.getProperty("nacos.core.address-server.retry", Integer.class, DEFAULT_SERVER_RETRY_TIME);
+        int maxRetry = EnvUtil.getProperty(ADDRESS_SERVER_RETRY_PROPERTY, Integer.class, DEFAULT_SERVER_RETRY_TIME);
         for (int i = 0; i < maxRetry; i++) {
             try {
                 syncFromAddressUrl();

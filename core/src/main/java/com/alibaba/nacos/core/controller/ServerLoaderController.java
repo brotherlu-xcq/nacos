@@ -75,6 +75,10 @@ public class ServerLoaderController {
     
     private static final String X_FORWARDED_FOR_SPLIT_SYMBOL = ",";
     
+    private static final String SUCCESS_RESULT = "Ok";
+    
+    private static final String FAIL_RESULT = "Fail";
+    
     @Autowired
     private ConnectionManager connectionManager;
     
@@ -222,7 +226,7 @@ public class ServerLoaderController {
             }
         }
         
-        return ResponseEntity.ok().body(result.get() ? "Ok" : "Fail");
+        return ResponseEntity.ok().body(result.get() ? SUCCESS_RESULT : FAIL_RESULT);
     }
     
     
