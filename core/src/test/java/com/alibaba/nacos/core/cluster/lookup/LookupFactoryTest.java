@@ -105,9 +105,7 @@ public class LookupFactoryTest extends TestCase {
     @After
     public void testShutdown() {
         try {
-            NotifyCenter.deregisterPublisher(MembersChangeEvent.class);
             memberManager.shutdown();
-            memberLookup.destroy();
         } catch (NacosException e) {
             e.printStackTrace();
         }
