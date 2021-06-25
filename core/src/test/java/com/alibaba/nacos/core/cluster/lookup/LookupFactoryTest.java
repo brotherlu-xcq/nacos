@@ -22,6 +22,7 @@ import com.alibaba.nacos.core.cluster.MemberLookup;
 import com.alibaba.nacos.core.cluster.ServerMemberManager;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import junit.framework.TestCase;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,5 +98,14 @@ public class LookupFactoryTest extends TestCase {
         String name2 = "address-server";
         memberLookup = LookupFactory.switchLookup(name2, memberManager);
         assertEquals(memberLookup.getClass(), AddressServerMemberLookup.class);
+    }
+    
+    @After
+    public void testShutdown() {
+        try {
+            memberManager.shutdown();
+        } catch (NacosException e) {
+            e.printStackTrace();
+        }
     }
 }

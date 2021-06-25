@@ -16,10 +16,12 @@
 
 package com.alibaba.nacos.core.cluster;
 
+import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.common.utils.ThreadUtils;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -240,4 +242,12 @@ public class MemberUtilTest {
         Assert.assertFalse(received.get());
     }
     
+    @After
+    public void shutdown() {
+        try {
+            memberManager.shutdown();
+        } catch (NacosException e) {
+            e.printStackTrace();
+        }
+    }
 }
