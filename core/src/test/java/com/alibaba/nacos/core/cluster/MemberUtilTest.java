@@ -245,6 +245,7 @@ public class MemberUtilTest {
     @After
     public void shutdown() {
         try {
+            NotifyCenter.deregisterPublisher(MembersChangeEvent.class);
             memberManager.shutdown();
         } catch (NacosException e) {
             e.printStackTrace();

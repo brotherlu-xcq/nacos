@@ -17,8 +17,10 @@
 package com.alibaba.nacos.core.cluster.lookup;
 
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.core.cluster.MemberLookup;
+import com.alibaba.nacos.core.cluster.MembersChangeEvent;
 import com.alibaba.nacos.core.cluster.ServerMemberManager;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import junit.framework.TestCase;
@@ -103,7 +105,9 @@ public class LookupFactoryTest extends TestCase {
     @After
     public void testShutdown() {
         try {
+            NotifyCenter.deregisterPublisher(MembersChangeEvent.class);
             memberManager.shutdown();
+            memberLookup.destroy();
         } catch (NacosException e) {
             e.printStackTrace();
         }
