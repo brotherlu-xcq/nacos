@@ -104,9 +104,9 @@ public class ConnectionManagerTest {
     }
     
     @Test
-    @Ignore("depend system env, need be refactor")
+//    @Ignore("depend system env, need be refactor")
     public void testTraced() throws InterruptedException {
-        TimeUnit.SECONDS.sleep(1);
+//        TimeUnit.SECONDS.sleep(1);
         Assert.assertTrue(connectionManager.traced(clientIp));
     }
     
