@@ -18,6 +18,7 @@ package com.alibaba.nacos.client.naming.core;
 
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.client.address.AbstractServerListManager;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import com.alibaba.nacos.client.naming.event.ServerListChangedEvent;
 import com.alibaba.nacos.common.lifecycle.Closeable;
 import com.alibaba.nacos.common.notify.NotifyCenter;
@@ -33,11 +34,11 @@ public class ServerListManager extends AbstractServerListManager implements Serv
     
     private static final String PROPERTY_ADDRESS_PLUGIN = "PropertyAddressPlugin";
     
-    public ServerListManager(Properties properties) throws NacosException {
+    public ServerListManager(NacosClientProperties properties) throws NacosException {
         this(properties, null);
     }
 
-    public ServerListManager(Properties properties, String namespace) throws NacosException {
+    public ServerListManager(NacosClientProperties properties, String namespace) throws NacosException {
         super(properties);
         this.namespace = namespace;
         if (namespace != null) {

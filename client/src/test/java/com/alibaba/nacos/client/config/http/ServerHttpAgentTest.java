@@ -19,6 +19,7 @@ package com.alibaba.nacos.client.config.http;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.client.config.impl.ServerListManager;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -31,7 +32,7 @@ public class ServerHttpAgentTest {
     public void testConstruct() throws NacosException {
         Properties properties = new Properties();
         properties.setProperty("endpoint", "aaa");
-        ServerListManager server = new ServerListManager(properties);
+        ServerListManager server = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties));
         final ServerHttpAgent serverHttpAgent1 = new ServerHttpAgent(server);
         Assert.assertNotNull(serverHttpAgent1);
         
@@ -50,7 +51,7 @@ public class ServerHttpAgentTest {
         Properties properties = new Properties();
         properties.setProperty("endpoint", "aaa");
         properties.setProperty("namespace", "namespace1");
-        ServerListManager server = new ServerListManager(properties);
+        ServerListManager server = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties));
         final ServerHttpAgent serverHttpAgent = new ServerHttpAgent(server, new Properties());
         
         final String appname = ServerHttpAgent.getAppname();

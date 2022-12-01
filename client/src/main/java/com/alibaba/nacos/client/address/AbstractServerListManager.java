@@ -19,6 +19,7 @@ package com.alibaba.nacos.client.address;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.SystemPropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import com.alibaba.nacos.client.naming.utils.InitUtils;
 import com.alibaba.nacos.client.utils.ContextPathUtil;
 import com.alibaba.nacos.client.utils.ParamUtil;
@@ -54,7 +55,7 @@ public abstract class AbstractServerListManager implements ServerListManager {
     
     private volatile boolean started = false;
     
-    public AbstractServerListManager(Properties properties) throws NacosException {
+    public AbstractServerListManager(NacosClientProperties properties) throws NacosException {
         this.initAddressPluginProperties(properties);
         this.initAddressPlugin(properties);
         this.initAddressPluginListener();
@@ -102,7 +103,7 @@ public abstract class AbstractServerListManager implements ServerListManager {
      * @param properties properties passed in by the user.
      * @return endpoint url
      */
-    private String getAddressServerUrl(Properties properties) {
+    private String getAddressServerUrl(NacosClientProperties properties) {
     
         String endpoint = properties.getProperty(PropertyKeyConst.ENDPOINT);
     
@@ -142,7 +143,7 @@ public abstract class AbstractServerListManager implements ServerListManager {
         }
         if (properties.containsKey(PropertyKeyConst.ENDPOINT_QUERY_PARAMS)) {
             addressServerUrl
-                    .append(hasQueryString ? "&" : "?" + properties.get(PropertyKeyConst.ENDPOINT_QUERY_PARAMS));
+                    .append(hasQueryString ? "&" : "?" + properties.getProperty(PropertyKeyConst.ENDPOINT_QUERY_PARAMS));
             
         }
         return addressServerUrl.toString();
@@ -153,7 +154,7 @@ public abstract class AbstractServerListManager implements ServerListManager {
      *
      * @param properties properties passed in by the user.
      */
-    private void initAddressPluginProperties(Properties properties) {
+    private void initAddressPluginProperties(NacosClientProperties properties) {
         
         // if endpoint url is not empty, put url to AddressProperties for plugin using
         String addressServerUrl = getAddressServerUrl(properties);
@@ -167,14 +168,14 @@ public abstract class AbstractServerListManager implements ServerListManager {
         }
         
         // put key and value that starting with addressPlugin to AddressProperties for plugin using
-        for (String key : properties.stringPropertyNames()) {
+        for (String key : properties.asProperties().stringPropertyNames()) {
             if (key.startsWith("addressPlugin")) {
                 AddressProperties.setProperties(key, properties.getProperty(key));
             }
         }
     }
     
-    private void initAddressPlugin(Properties properties) throws NacosException {
+    private void initAddressPlugin(NacosClientProperties properties) throws NacosException {
         
         String addressPluginName = properties.getProperty("addressPluginName");
         String endpoint = InitUtils.initEndpoint(properties);

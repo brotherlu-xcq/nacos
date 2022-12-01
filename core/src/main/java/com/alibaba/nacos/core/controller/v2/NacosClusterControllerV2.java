@@ -120,8 +120,7 @@ public class NacosClusterControllerV2 {
             throw new NacosApiException(HttpStatus.BAD_REQUEST.value(), ErrorCode.PARAMETER_MISSING,
                     "required parameter 'type' is missing");
         }
-
-        return Result.success(        nacosClusterOperationService.switchAddressPlugin(request.getType()));
+        return Result.success(nacosClusterOperationService.updateLookup(request));
     }
     
     /**

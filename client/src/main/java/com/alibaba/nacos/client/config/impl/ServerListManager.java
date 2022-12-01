@@ -18,23 +18,12 @@ package com.alibaba.nacos.client.config.impl;
 
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.client.env.NacosClientProperties;
-import com.alibaba.nacos.client.utils.ContextPathUtil;
-import com.alibaba.nacos.client.utils.EnvUtil;
-import com.alibaba.nacos.client.utils.LogUtils;
-import com.alibaba.nacos.client.utils.ParamUtil;
-import com.alibaba.nacos.client.utils.TemplateUtils;
-import com.alibaba.nacos.common.http.HttpRestResult;
-import com.alibaba.nacos.common.http.client.NacosRestTemplate;
-import com.alibaba.nacos.common.http.param.Header;
-import com.alibaba.nacos.common.http.param.Query;
 import com.alibaba.nacos.client.address.AbstractServerListManager;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import com.alibaba.nacos.common.lifecycle.Closeable;
 import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.plugin.address.exception.AddressException;
-
-import java.util.Properties;
 
 public class ServerListManager extends AbstractServerListManager implements Closeable {
     
@@ -54,13 +43,13 @@ public class ServerListManager extends AbstractServerListManager implements Clos
     
     boolean isFixed;
     
-    public ServerListManager(Properties properties) throws NacosException {
+    public ServerListManager(NacosClientProperties properties) throws NacosException {
         super(properties);
         this.initParam(properties);
         this.initServerName(properties);
     }
 
-    private void initParam(Properties properties) {
+    private void initParam(NacosClientProperties properties) {
         this.isFixed = this.addressPlugin.getPluginName().equals(PROPERTY_ADDRESS_PLUGIN_NAME);
         String contentPathTemp = properties.getProperty(PropertyKeyConst.CONTEXT_PATH);
         if (!StringUtils.isBlank(contentPathTemp)) {
@@ -74,11 +63,11 @@ public class ServerListManager extends AbstractServerListManager implements Clos
         }
     }
     
-    private void initServerName(Properties properties) {
+    private void initServerName(NacosClientProperties properties) {
         String serverName = "";
 
         if (properties != null && properties.containsKey(PropertyKeyConst.SERVER_NAME)) {
-            serverName = properties.get(PropertyKeyConst.SERVER_NAME).toString();
+            serverName = properties.getProperty(PropertyKeyConst.SERVER_NAME);
         } else {
             String pluginName = getAddressPluginName();
             if (pluginName.equals("PropertyAddressPlugin")) {

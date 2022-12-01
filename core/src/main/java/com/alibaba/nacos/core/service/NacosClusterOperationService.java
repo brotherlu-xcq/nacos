@@ -94,7 +94,7 @@ public class NacosClusterOperationService {
      * Addressing mode switch.
      */
     public Boolean updateLookup(LookupUpdateRequest request) throws NacosException {
-        memberManager.switchLookup(request.getType());
+        memberManager.switchAddressPlugin(request.getType());
         return true;
     }
     

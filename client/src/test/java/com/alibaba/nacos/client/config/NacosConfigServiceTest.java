@@ -105,7 +105,7 @@ public class NacosConfigServiceTest {
         final NacosClientProperties properties = NacosClientProperties.PROTOTYPE.derive(new Properties());
         properties.setProperty("endpoint", "localhost");
         properties.setProperty("endpointPort", "8080");
-        Mockito.when(mockWoker.getAgent()).thenReturn(new ConfigTransportClient(properties, new ServerListManager()) {
+        Mockito.when(mockWoker.getAgent()).thenReturn(new ConfigTransportClient(properties, new ServerListManager(properties)) {
             @Override
             public void startInternal() throws NacosException {
                 // NOOP

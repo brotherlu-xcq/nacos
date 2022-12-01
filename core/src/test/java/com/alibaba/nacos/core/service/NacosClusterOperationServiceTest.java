@@ -134,7 +134,7 @@ public class NacosClusterOperationServiceTest {
         LookupUpdateRequest lookupUpdateRequest = new LookupUpdateRequest();
         lookupUpdateRequest.setType("test");
         Boolean result = nacosClusterOperationService.updateLookup(lookupUpdateRequest);
-        verify(serverMemberManager).switchLookup("test");
+        verify(serverMemberManager).switchAddressPlugin("test");
         assertEquals(true, result);
     }
 }
