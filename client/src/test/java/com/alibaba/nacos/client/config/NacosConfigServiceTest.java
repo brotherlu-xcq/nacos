@@ -24,6 +24,7 @@ import com.alibaba.nacos.client.config.impl.ClientWorker;
 import com.alibaba.nacos.client.config.impl.ConfigTransportClient;
 import com.alibaba.nacos.client.config.impl.LocalConfigInfoProcessor;
 import com.alibaba.nacos.client.config.impl.ServerListManager;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -101,10 +102,10 @@ public class NacosConfigServiceTest {
         response.setContent(content);
         response.setConfigType("bb");
         Mockito.when(mockWoker.getServerConfig(dataId, group, "", timeout, false)).thenReturn(response);
-        Properties properties = new Properties();
+        final NacosClientProperties properties = NacosClientProperties.PROTOTYPE.derive(new Properties());
         properties.setProperty("endpoint", "localhost");
         properties.setProperty("endpointPort", "8080");
-        Mockito.when(mockWoker.getAgent()).thenReturn(new ConfigTransportClient(new Properties(), new ServerListManager(properties)) {
+        Mockito.when(mockWoker.getAgent()).thenReturn(new ConfigTransportClient(properties, new ServerListManager()) {
             @Override
             public void startInternal() throws NacosException {
                 // NOOP

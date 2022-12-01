@@ -20,6 +20,7 @@ import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.client.config.filter.impl.ConfigResponse;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import com.alibaba.nacos.client.security.SecurityProxy;
 import com.alibaba.nacos.client.utils.ParamUtil;
 import com.alibaba.nacos.common.utils.ConvertUtils;
@@ -66,7 +67,7 @@ public abstract class ConfigTransportClient {
         securityProxy.shutdown();
     }
     
-    public ConfigTransportClient(Properties properties, ServerListManager serverListManager) {
+    public ConfigTransportClient(NacosClientProperties properties, ServerListManager serverListManager) {
         
         String encodeTmp = properties.getProperty(PropertyKeyConst.ENCODE);
         if (StringUtils.isBlank(encodeTmp)) {
@@ -77,7 +78,7 @@ public abstract class ConfigTransportClient {
         
         this.tenant = properties.getProperty(PropertyKeyConst.NAMESPACE);
         this.serverListManager = serverListManager;
-        this.properties = properties;
+        this.properties = properties.asProperties();
         this.securityProxy = new SecurityProxy(serverListManager.getServerList(),
                 ConfigHttpClientManager.getInstance().getNacosRestTemplate());
     }

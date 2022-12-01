@@ -18,7 +18,6 @@ package com.alibaba.nacos.core.cluster;
 
 import com.alibaba.nacos.api.ability.ServerAbilities;
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.exception.runtime.NacosRuntimeException;
 import com.alibaba.nacos.auth.util.AuthHeaderUtil;
 import com.alibaba.nacos.common.JustForTest;
 import com.alibaba.nacos.common.http.Callback;
@@ -33,6 +32,7 @@ import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.notify.listener.Subscriber;
 import com.alibaba.nacos.common.utils.ConcurrentHashSet;
 import com.alibaba.nacos.common.utils.ExceptionUtil;
+import com.alibaba.nacos.common.utils.JacksonUtils;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.common.utils.VersionUtils;
 import com.alibaba.nacos.core.ability.ServerAbilityInitializer;
@@ -54,7 +54,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PreDestroy;
@@ -105,35 +104,35 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
     private static final String MEMBER_CHANGE_EVENT_QUEUE_SIZE_PROPERTY = "nacos.member-change-event.queue.size";
     
     private static final int DEFAULT_MEMBER_CHANGE_EVENT_QUEUE_SIZE = 128;
-    
+
     private static final long DEFAULT_TASK_DELAY_TIME = 5_000L;
     
     private static final String ADDRESS_SERVER_URL = "addressServerUrl";
-    
+
     private static final String ENV_ID_URL = "envIdUrl";
-    
+
     private static final String ADDRESS_PLUGIN = "address.plugin";
-    
+
     private static final String STANDALONE_ADDRESS_PLUGIN_NAME = "standalone";
-    
+
     private static final String ADDRESS_PLUGIN_TYPE = "nacos.core.member.lookup.type";
-    
+
     private static final String ADDRESS_SERVER_DOMAIN_ENV = "address_server_domain";
-    
+
     private static final String ADDRESS_SERVER_DOMAIN_PROPERTY = "address.server.domain";
-    
+
     private static final String ADDRESS_SERVER_PORT_ENV = "address_server_port";
-    
+
     private static final String ADDRESS_SERVER_PORT_PROPERTY = "address.server.port";
-    
+
     private static final String ADDRESS_SERVER_URL_ENV = "address_server_url";
-    
+
     private static final String ADDRESS_SERVER_URL_PROPERTY = "address.server.url";
-    
+
     private static final String DEFAULT_SERVER_DOMAIN = "jmenv.tbsite.net";
-    
+
     private static final String DEFAULT_SERVER_POINT = "8080";
-    
+
     /**
      * Cluster node list.
      */
@@ -174,7 +173,6 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
     public ServerMemberManager(ServletContext servletContext) throws Exception {
         this.serverList = new ConcurrentSkipListMap<>();
         EnvUtil.setContextPath(servletContext.getContextPath());
-        
         init();
     }
     
@@ -227,14 +225,14 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         List<String> serverListTemp = this.addressPlugin.getServerList();
         memberChange(MemberUtil.readServerConf(serverListTemp));
     }
-    
+
     private void initAndStartAddressPlugin() throws NacosException {
         initAddressProperties();
         initAddressPlugin();
         registerPluginListener();
         addressPlugin.start();
     }
-    
+
     /**
      * register address plugin listener.
      *
@@ -247,17 +245,17 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
             memberChange(members);
         });
     }
-    
+
     private void initAddressProperties() {
         initAddressServerUrl();
-        
+
         Map<String, String> env = System.getenv();
         for (String key : env.keySet()) {
             if (key.startsWith(ADDRESS_PLUGIN)) {
                 AddressProperties.setProperties(key, env.get(key));
             }
         }
-        
+
         ConfigurableEnvironment environment = EnvUtil.getEnvironment();
         MutablePropertySources propertySources = environment.getPropertySources();
         propertySources.forEach(propertySource -> {
@@ -271,9 +269,9 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
                 }
             }
         });
-        
+
     }
-    
+
     private void initAddressServerUrl() {
         String domainName = System.getenv(ADDRESS_SERVER_DOMAIN_ENV);
         if (StringUtils.isBlank(domainName)) {
@@ -283,21 +281,21 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         if (StringUtils.isBlank(addressPort)) {
             addressPort = EnvUtil.getProperty(ADDRESS_SERVER_PORT_PROPERTY, DEFAULT_SERVER_POINT);
         }
-        
+
         String addressUrl = System.getenv(ADDRESS_SERVER_URL_ENV);
         if (StringUtils.isBlank(addressUrl)) {
             addressUrl = EnvUtil.getProperty(ADDRESS_SERVER_URL_PROPERTY, EnvUtil.getContextPath() + "/" + "serverlist");
         }
-        
+
         String addressServerUrl = HTTP_PREFIX + domainName + ":" + addressPort + addressUrl;
         String envIdUrl = HTTP_PREFIX + domainName + ":" + addressPort + "/env";
-        
+
         AddressProperties.setProperties(ADDRESS_SERVER_URL, addressServerUrl);
         AddressProperties.setProperties(ENV_ID_URL, envIdUrl);
         Loggers.CORE.info("ServerListService address-server port:" + addressPort);
         Loggers.CORE.info("ADDRESS_SERVER_URL:" + addressServerUrl);
     }
-    
+
     private void initAddressPlugin() throws NacosException {
         Optional<AddressPlugin> addressPluginTemp;
         if (EnvUtil.getStandaloneMode()) {
@@ -348,7 +346,7 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
             }
         });
     }
-    
+
     /**
      * member information update.
      *
@@ -360,6 +358,7 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         
         String address = newMember.getAddress();
         if (!serverList.containsKey(address)) {
+            Loggers.CLUSTER.warn("address {} want to update Member, but not in member list!", newMember.getAddress());
             return false;
         }
         
@@ -650,39 +649,8 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
                         .post(url, header, Query.EMPTY, getSelf(), reference.getType(), new Callback<String>() {
                             @Override
                             public void onReceive(RestResult<String> result) {
-                                if (result.getCode() == HttpStatus.NOT_IMPLEMENTED.value()
-                                        || result.getCode() == HttpStatus.NOT_FOUND.value()) {
-                                    Loggers.CLUSTER
-                                            .warn("{} version is too low, it is recommended to upgrade the version : {}",
-                                                    target, VersionUtils.version);
-                                    Member memberNew = null;
-                                    if (target.getExtendVal(MemberMetaDataConstants.VERSION) != null) {
-                                        memberNew = target.copy();
-                                        // Clean up remote version info.
-                                        // This value may still stay in extend info when remote server has been downgraded to old version.
-                                        memberNew.delExtendVal(MemberMetaDataConstants.VERSION);
-                                        memberNew.delExtendVal(MemberMetaDataConstants.READY_TO_UPGRADE);
-                                        Loggers.CLUSTER.warn("{} : Clean up version info,"
-                                                + " target has been downgrade to old version.", memberNew);
-                                    }
-                                    if (target.getAbilities() != null
-                                            && target.getAbilities().getRemoteAbility() != null && target.getAbilities()
-                                            .getRemoteAbility().isSupportRemoteConnection()) {
-                                        if (memberNew == null) {
-                                            memberNew = target.copy();
-                                        }
-                                        memberNew.getAbilities().getRemoteAbility().setSupportRemoteConnection(false);
-                                        Loggers.CLUSTER
-                                                .warn("{} : Clear support remote connection flag,target may rollback version ",
-                                                        memberNew);
-                                    }
-                                    if (memberNew != null) {
-                                        update(memberNew);
-                                    }
-                                    return;
-                                }
                                 if (result.ok()) {
-                                    MemberUtil.onSuccess(ServerMemberManager.this, target);
+                                    handleReportResult(result.getData(), target);
                                 } else {
                                     Loggers.CLUSTER.warn("failed to report new info to target node : {}, result : {}",
                                             target.getAddress(), result);
@@ -711,6 +679,25 @@ public class ServerMemberManager implements ApplicationListener<WebServerInitial
         @Override
         protected void after() {
             GlobalExecutor.scheduleByCommon(this, 2_000L);
+        }
+
+        private void handleReportResult(String reportResult, Member target) {
+            if (isBooleanResult(reportResult)) {
+                MemberUtil.onSuccess(ServerMemberManager.this, target);
+                return;
+            }
+            try {
+                Member member = JacksonUtils.toObj(reportResult, Member.class);
+                MemberUtil.onSuccess(ServerMemberManager.this, target, member);
+            } catch (Exception e) {
+                Loggers.CLUSTER.warn("Receive invalid report result from target {}, context {}", target.getAddress(),
+                        reportResult);
+                MemberUtil.onSuccess(ServerMemberManager.this, target);
+            }
+        }
+
+        private boolean isBooleanResult(String reportResult) {
+            return Boolean.TRUE.toString().equals(reportResult) || Boolean.FALSE.toString().equals(reportResult);
         }
     }
     

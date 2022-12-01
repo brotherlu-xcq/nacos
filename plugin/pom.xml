@@ -33,6 +33,9 @@
         <module>auth</module>
         <module>encryption</module>
         <module>address</module>
+        <module>trace</module>
+        <module>datasource</module>
+        <module>environment</module>
     </modules>
     <packaging>pom</packaging>
 

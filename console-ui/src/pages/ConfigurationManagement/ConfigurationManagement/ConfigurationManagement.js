@@ -45,6 +45,8 @@ import DashboardCard from './DashboardCard';
 import { getParams, setParams, request } from '@/globalLib';
 import { connect } from 'react-redux';
 import { getConfigs } from '../../../reducers/configuration';
+import PageTitle from '../../../components/PageTitle';
+import QueryResult from '../../../components/QueryResult';
 
 import './index.scss';
 import { LANGUAGE_KEY, GLOBAL_PAGE_SIZE_LIST } from '../../../constants';
@@ -331,11 +333,11 @@ class ConfigurationManagement extends React.Component {
         <div style={{ marginTop: '-20px' }}>
           <h3>{locale.sureDelete}</h3>
           <p>
-            <span style={{ color: '#999', marginRight: 5 }}>Data ID:</span>
+            <span style={{ color: '#999', marginRight: 5 }}>Data ID</span>
             <span style={{ color: '#c7254e' }}>{record.dataId}</span>
           </p>
           <p>
-            <span style={{ color: '#999', marginRight: 5 }}>Group:</span>
+            <span style={{ color: '#999', marginRight: 5 }}>Group</span>
             <span style={{ color: '#c7254e' }}>{record.group}</span>
           </p>
           <p>
@@ -397,10 +399,9 @@ class ConfigurationManagement extends React.Component {
 
         <Dropdown
           trigger={
-            <span style={{ color: '#33cde5' }}>
-              {locale.more}
-              <Icon type={'arrow-down-filling'} size={'xxs'} />
-            </span>
+            <a title={locale.more}>
+              <Icon type="ellipsis" size={'small'} style={{ transform: 'rotate(90deg)' }} />
+            </a>
           }
           triggerType={'click'}
         >
@@ -989,7 +990,7 @@ class ConfigurationManagement extends React.Component {
       accept: 'application/zip',
       action: `v1/cs/configs?import=true&namespace=${getParams(
         'namespace'
-      )}&accessToken=${accessToken}&username=${username}`,
+      )}&accessToken=${accessToken}&username=${username}&tenant=${getParams('namespace')}`,
       headers: Object.assign({}, {}, { accessToken }),
       data: {
         policy: self.field.getValue('sameConfigPolicy'),
@@ -1096,62 +1097,33 @@ class ConfigurationManagement extends React.Component {
             className={this.state.hasdash ? 'dash-left-container' : ''}
             style={{ position: 'relative' }}
           >
-            <div style={{ display: this.inApp ? 'none' : 'block', marginTop: -15 }}>
+            <div style={{ display: this.inApp ? 'none' : 'block' }}>
+              <PageTitle
+                title={locale.configurationManagement8}
+                desc={this.state.nownamespace_id}
+                nameSpace
+              />
               <RegionGroup
                 namespaceCallBack={this.cleanAndGetData.bind(this)}
                 setNowNameSpace={this.setNowNameSpace.bind(this)}
               />
             </div>
-            <div
-              style={{
-                display: this.inApp ? 'none' : 'block',
-                position: 'relative',
-                width: '100%',
-                overflow: 'hidden',
-                height: '40px',
-              }}
-            >
-              <h3
-                style={{
-                  height: 30,
-                  width: '100%',
-                  lineHeight: '30px',
-                  padding: 0,
-                  margin: 0,
-                  paddingLeft: 10,
-                  borderLeft: '3px solid #09c',
-                  color: '#ccc',
-                  fontSize: '12px',
-                }}
-              >
-                <span style={{ fontSize: '14px', color: '#000', marginRight: 8 }}>
-                  {locale.configurationManagement8}
-                </span>
-                <span style={{ fontSize: '14px', color: '#000', marginRight: 8 }}>|</span>
-                <span style={{ fontSize: '14px', color: '#000', marginRight: 8 }}>
-                  {this.state.nownamespace_name}
-                </span>
-                <span style={{ fontSize: '14px', color: '#000', marginRight: 18 }}>
-                  {this.state.nownamespace_id}
-                </span>
-                {locale.queryResults}
-                <strong style={{ fontWeight: 'bold' }}> {configurations.totalCount} </strong>
-                {locale.articleMeetRequirements}
-              </h3>
-              <div
-                style={{ position: 'absolute', textAlign: 'right', zIndex: 2, right: 0, top: 0 }}
-              />
-            </div>
+
             <div
               style={{
                 position: 'relative',
                 marginTop: 10,
-                height: this.state.isAdvancedQuery ? 'auto' : 42,
-                overflow: 'hidden',
+                height: 'auto',
+                overflow: 'visible',
               }}
             >
               <Form inline>
-                <Form.Item label="Data ID:">
+                <Form.Item>
+                  <Button type="primary" onClick={this.chooseEnv.bind(this)}>
+                    {locale.createConfiguration}
+                  </Button>
+                </Form.Item>
+                <Form.Item label="Data ID">
                   <Input
                     value={this.dataId}
                     htmlType="text"
@@ -1167,7 +1139,7 @@ class ConfigurationManagement extends React.Component {
                   />
                 </Form.Item>
 
-                <Form.Item label="Group:">
+                <Form.Item label="Group">
                   <Select.AutoComplete
                     style={{ width: 200 }}
                     size={'medium'}
@@ -1182,7 +1154,7 @@ class ConfigurationManagement extends React.Component {
                   />
                 </Form.Item>
 
-                <Form.Item label="默认模糊匹配:">
+                <Form.Item label="默认模糊匹配">
                   <Switch
                     checkedChildren=""
                     unCheckedChildren=""
@@ -1236,8 +1208,14 @@ class ConfigurationManagement extends React.Component {
                 </Form.Item>
                 <br />
                 <Form.Item
-                  style={this.inApp ? { display: 'none' } : {}}
-                  label={locale.application0}
+                  style={
+                    this.inApp
+                      ? { display: 'none' }
+                      : this.state.isAdvancedQuery
+                      ? {}
+                      : { display: 'none' }
+                  }
+                  label={locale.application}
                 >
                   <Input
                     htmlType={'text'}
@@ -1248,7 +1226,10 @@ class ConfigurationManagement extends React.Component {
                     onPressEnter={() => this.getData()}
                   />
                 </Form.Item>
-                <Form.Item label={locale.tags}>
+                <Form.Item
+                  style={this.state.isAdvancedQuery ? {} : { display: 'none' }}
+                  label={locale.tags}
+                >
                   <Select
                     style={{ width: 200 }}
                     size="medium"
@@ -1269,7 +1250,7 @@ class ConfigurationManagement extends React.Component {
                   />
                 </Form.Item>
               </Form>
-              <div style={{ position: 'absolute', right: 10, top: 4 }}>
+              <div style={{ position: 'absolute', right: 10, top: 0 }}>
                 <Icon
                   type="add"
                   size="medium"
@@ -1286,6 +1267,8 @@ class ConfigurationManagement extends React.Component {
                 />
               </div>
             </div>
+            <QueryResult total={configurations.totalCount} />
+
             <Table
               className="configuration-table"
               dataSource={configurations.pageItems}

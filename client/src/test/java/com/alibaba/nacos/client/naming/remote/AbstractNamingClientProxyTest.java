@@ -26,11 +26,11 @@ import com.alibaba.nacos.api.naming.pojo.Service;
 import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import com.alibaba.nacos.api.selector.AbstractSelector;
 import com.alibaba.nacos.client.auth.ram.utils.SignUtil;
-import com.alibaba.nacos.plugin.auth.api.RequestResource;
 import com.alibaba.nacos.client.naming.event.ServerListChangedEvent;
 import com.alibaba.nacos.client.security.SecurityProxy;
 import com.alibaba.nacos.client.utils.AppNameUtils;
 import com.alibaba.nacos.common.notify.Event;
+import com.alibaba.nacos.plugin.auth.api.RequestResource;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +40,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -51,6 +50,9 @@ public class AbstractNamingClientProxyTest {
     @Mock
     private SecurityProxy sc;
     
+    /**
+     * test get security headers for accessToken.
+     */
     @Test
     public void testGetSecurityHeadersForAccessToken() {
         AbstractNamingClientProxy proxy = new MockNamingClientProxy(sc);
@@ -64,6 +66,11 @@ public class AbstractNamingClientProxyTest {
         Assert.assertEquals(AppNameUtils.getAppName(), securityHeaders.get("app"));
     }
     
+    /**
+     * get security headers for ram.
+     *
+     * @throws Exception exception
+     */
     @Test
     public void testGetSecurityHeadersForRam() throws Exception {
         String ak = "aa";
@@ -95,13 +102,19 @@ public class AbstractNamingClientProxyTest {
         public void registerService(String serviceName, String groupName, Instance instance) throws NacosException {
         
         }
-    
+        
         @Override
         public void batchRegisterService(String serviceName, String groupName, List<Instance> instances)
                 throws NacosException {
-        
+            
         }
-    
+        
+        @Override
+        public void batchDeregisterService(String serviceName, String groupName, List<Instance> instances)
+                throws NacosException {
+            
+        }
+        
         @Override
         public void deregisterService(String serviceName, String groupName, Instance instance) throws NacosException {
         
@@ -157,11 +170,6 @@ public class AbstractNamingClientProxyTest {
         @Override
         public boolean isSubscribed(String serviceName, String groupName, String clusters) throws NacosException {
             return false;
-        }
-        
-        @Override
-        public void updateBeatInfo(Set<Instance> modifiedInstances) {
-        
         }
         
         @Override

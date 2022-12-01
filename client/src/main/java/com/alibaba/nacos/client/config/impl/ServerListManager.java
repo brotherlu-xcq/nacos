@@ -18,6 +18,16 @@ package com.alibaba.nacos.client.config.impl;
 
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.client.env.NacosClientProperties;
+import com.alibaba.nacos.client.utils.ContextPathUtil;
+import com.alibaba.nacos.client.utils.EnvUtil;
+import com.alibaba.nacos.client.utils.LogUtils;
+import com.alibaba.nacos.client.utils.ParamUtil;
+import com.alibaba.nacos.client.utils.TemplateUtils;
+import com.alibaba.nacos.common.http.HttpRestResult;
+import com.alibaba.nacos.common.http.client.NacosRestTemplate;
+import com.alibaba.nacos.common.http.param.Header;
+import com.alibaba.nacos.common.http.param.Query;
 import com.alibaba.nacos.client.address.AbstractServerListManager;
 import com.alibaba.nacos.common.lifecycle.Closeable;
 import com.alibaba.nacos.common.notify.NotifyCenter;
@@ -49,14 +59,14 @@ public class ServerListManager extends AbstractServerListManager implements Clos
         this.initParam(properties);
         this.initServerName(properties);
     }
-    
+
     private void initParam(Properties properties) {
         this.isFixed = this.addressPlugin.getPluginName().equals(PROPERTY_ADDRESS_PLUGIN_NAME);
         String contentPathTemp = properties.getProperty(PropertyKeyConst.CONTEXT_PATH);
         if (!StringUtils.isBlank(contentPathTemp)) {
             this.contentPath = contentPathTemp;
         }
-        
+
         String namespaceTemp = properties.getProperty(PropertyKeyConst.NAMESPACE);
         if (!StringUtils.isBlank(contentPathTemp)) {
             this.namespace = namespaceTemp;
@@ -66,7 +76,7 @@ public class ServerListManager extends AbstractServerListManager implements Clos
     
     private void initServerName(Properties properties) {
         String serverName = "";
-        
+
         if (properties != null && properties.containsKey(PropertyKeyConst.SERVER_NAME)) {
             serverName = properties.get(PropertyKeyConst.SERVER_NAME).toString();
         } else {
@@ -83,7 +93,7 @@ public class ServerListManager extends AbstractServerListManager implements Clos
                         + (StringUtils.isNotBlank(namespace) ? ("_" + StringUtils.trim(namespace)) : "");
             }
         }
-    
+
         serverName.replaceAll("\\/", "_");
         serverName.replaceAll("\\:", "_");
         this.name = serverName;

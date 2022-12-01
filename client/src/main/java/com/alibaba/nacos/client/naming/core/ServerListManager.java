@@ -36,7 +36,7 @@ public class ServerListManager extends AbstractServerListManager implements Serv
     public ServerListManager(Properties properties) throws NacosException {
         this(properties, null);
     }
-    
+
     public ServerListManager(Properties properties, String namespace) throws NacosException {
         super(properties);
         this.namespace = namespace;
