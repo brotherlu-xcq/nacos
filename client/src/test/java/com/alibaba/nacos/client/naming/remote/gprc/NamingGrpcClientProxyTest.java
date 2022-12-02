@@ -82,7 +82,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NamingGrpcClientProxyTest {
-    
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     
@@ -125,9 +125,10 @@ public class NamingGrpcClientProxyTest {
         System.setProperty(GrpcConstants.GRPC_SERVER_CHECK_TIMEOUT, "1000");
         List<String> serverList = Stream.of(ORIGIN_SERVER, "anotherServer").collect(Collectors.toList());
         when(factory.getServerList()).thenReturn(serverList);
-        when(factory.genNextServer()).thenReturn(ORIGIN_SERVER);
+        when(factory.getNextServer()).thenReturn(ORIGIN_SERVER);
+        
         prop = new Properties();
-    
+
         final NacosClientProperties nacosClientProperties = NacosClientProperties.PROTOTYPE.derive(prop);
         client = new NamingGrpcClientProxy(NAMESPACE_ID, proxy, factory, nacosClientProperties, holder);
         Field rpcClientField = NamingGrpcClientProxy.class.getDeclaredField("rpcClient");
@@ -148,7 +149,7 @@ public class NamingGrpcClientProxyTest {
         System.setProperty(GrpcConstants.GRPC_SERVER_CHECK_TIMEOUT, "3000");
         client.shutdown();
     }
-    
+
     @Test
     public void testRegisterService() throws NacosException {
         client.registerService(SERVICE_NAME, GROUP_NAME, instance);
@@ -181,7 +182,7 @@ public class NamingGrpcClientProxyTest {
     public void testRegisterServiceThrowsException() throws NacosException {
         expectedException.expect(NacosException.class);
         expectedException.expectMessage("Request nacos server failed: ");
-        
+
         when(this.rpcClient.request(Mockito.any())).thenReturn(null);
         
         try {
@@ -300,7 +301,7 @@ public class NamingGrpcClientProxyTest {
         verify(this.rpcClient, times(1)).request(argThat(request -> {
             if (request instanceof SubscribeServiceRequest) {
                 SubscribeServiceRequest request1 = (SubscribeServiceRequest) request;
-                
+
                 // verify request fields
                 return !request1.isSubscribe() && SERVICE_NAME.equals(request1.getServiceName()) && GROUP_NAME
                         .equals(request1.getGroupName()) && CLUSTERS.equals(request1.getClusters()) && NAMESPACE_ID
@@ -309,7 +310,7 @@ public class NamingGrpcClientProxyTest {
             return false;
         }));
     }
-    
+
     @Test
     public void testServerHealthy() {
         when(this.rpcClient.isRunning()).thenReturn(true);
@@ -338,32 +339,32 @@ public class NamingGrpcClientProxyTest {
             public String name() {
                 return "testServerListHasChanged";
             }
-            
+
             @Override
             public int retryTimes() {
                 return 3;
             }
-            
+
             @Override
             public long timeOutMills() {
                 return 3000L;
             }
-            
+
             @Override
             public long connectionKeepAlive() {
                 return 5000L;
             }
-            
+
             @Override
             public int healthCheckRetryTimes() {
                 return 1;
             }
-            
+
             @Override
             public long healthCheckTimeOut() {
                 return 3000L;
             }
-            
+
             @Override
             public Map<String, String> labels() {
                 return new HashMap<>();
@@ -398,7 +399,7 @@ public class NamingGrpcClientProxyTest {
                     
                     @Override
                     public void asyncRequest(Request request, RequestCallBack requestCallBack) throws NacosException {
-                    
+
                     }
                     
                     @Override
@@ -429,7 +430,7 @@ public class NamingGrpcClientProxyTest {
         Assert.assertEquals(ORIGIN_SERVER, rpc.getCurrentServer().getServerIp());
         
         String newServer = "www.aliyun.com";
-        when(factory.genNextServer()).thenReturn(newServer);
+        when(factory.getNextServer()).thenReturn(newServer);
         when(factory.getServerList()).thenReturn(Stream.of(newServer, "anotherServer").collect(Collectors.toList()));
         NotifyCenter.publishEvent(new ServerListChangedEvent());
         

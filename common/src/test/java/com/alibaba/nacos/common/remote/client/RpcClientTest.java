@@ -520,7 +520,7 @@ public class RpcClientTest {
     public void testNextRpcServerForIpv4WithPort() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("127.0.0.1:7777");
+        when(serverListFactory.getNextServer()).thenReturn("127.0.0.1:7777");
         RpcClient.ServerInfo actual = rpcClient.nextRpcServer();
         assertEquals("127.0.0.1:7777", actual.getAddress());
         assertEquals("127.0.0.1", actual.getServerIp());
@@ -531,7 +531,7 @@ public class RpcClientTest {
     public void testNextRpcServerForIpv4WithoutPort() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("127.0.0.1");
+        when(serverListFactory.getNextServer()).thenReturn("127.0.0.1");
         RpcClient.ServerInfo actual = rpcClient.nextRpcServer();
         assertEquals("127.0.0.1:8848", actual.getAddress());
         assertEquals("127.0.0.1", actual.getServerIp());
@@ -542,7 +542,7 @@ public class RpcClientTest {
     public void testNextRpcServerForIpv6WithPort() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("[fe80::35ba:6827:c5ff:d161%11]:7777");
+        when(serverListFactory.getNextServer()).thenReturn("[fe80::35ba:6827:c5ff:d161%11]:7777");
         RpcClient.ServerInfo actual = rpcClient.nextRpcServer();
         assertEquals("[fe80::35ba:6827:c5ff:d161%11]:7777", actual.getAddress());
         assertEquals("[fe80::35ba:6827:c5ff:d161%11]", actual.getServerIp());
@@ -553,7 +553,7 @@ public class RpcClientTest {
     public void testNextRpcServerForIpv6WithoutPort() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("[fe80::35ba:6827:c5ff:d161%11]");
+        when(serverListFactory.getNextServer()).thenReturn("[fe80::35ba:6827:c5ff:d161%11]");
         RpcClient.ServerInfo actual = rpcClient.nextRpcServer();
         assertEquals("[fe80::35ba:6827:c5ff:d161%11]:8848", actual.getAddress());
         assertEquals("[fe80::35ba:6827:c5ff:d161%11]", actual.getServerIp());
@@ -564,7 +564,7 @@ public class RpcClientTest {
     public void testNextRpcServerForDomainWithPort() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("nacos.io:7777");
+        when(serverListFactory.getNextServer()).thenReturn("nacos.io:7777");
         RpcClient.ServerInfo actual = rpcClient.nextRpcServer();
         assertEquals("nacos.io:7777", actual.getAddress());
         assertEquals("nacos.io", actual.getServerIp());
@@ -575,7 +575,7 @@ public class RpcClientTest {
     public void testNextRpcServerForDomainWithoutPort() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("nacos.io");
+        when(serverListFactory.getNextServer()).thenReturn("nacos.io");
         RpcClient.ServerInfo actual = rpcClient.nextRpcServer();
         assertEquals("nacos.io:8848", actual.getAddress());
         assertEquals("nacos.io", actual.getServerIp());
@@ -586,7 +586,7 @@ public class RpcClientTest {
     public void testNextRpcServerForLocalhostWithPort() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("localhost:7777");
+        when(serverListFactory.getNextServer()).thenReturn("localhost:7777");
         RpcClient.ServerInfo actual = rpcClient.nextRpcServer();
         assertEquals("localhost:7777", actual.getAddress());
         assertEquals("localhost", actual.getServerIp());
@@ -597,7 +597,7 @@ public class RpcClientTest {
     public void testNextRpcServerForLocalhostWithoutPort() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("localhost");
+        when(serverListFactory.getNextServer()).thenReturn("localhost");
         RpcClient.ServerInfo actual = rpcClient.nextRpcServer();
         assertEquals("localhost:8848", actual.getAddress());
         assertEquals("localhost", actual.getServerIp());
@@ -608,7 +608,7 @@ public class RpcClientTest {
     public void testNextRpcServerForEmpty() {
         RpcClient rpcClient = buildTestNextRpcServerClient();
         rpcClient.serverListFactory(serverListFactory);
-        when(serverListFactory.genNextServer()).thenReturn("");
+        when(serverListFactory.getNextServer()).thenReturn("");
         rpcClient.nextRpcServer();
     }
     

@@ -22,16 +22,16 @@ import com.alibaba.nacos.client.env.NacosClientProperties;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 
 public class ServerListManagerTest {
     
     @Test
     public void testStart() throws NacosException {
-        final ServerListManager mgr = new ServerListManager("localhost", 0);
+        Properties properties = new Properties();
+        properties.setProperty("endpoint", "localhost");
+        properties.setProperty("endpointPort", "0");
+        final ServerListManager mgr = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties));
         try {
             mgr.start();
             Assert.fail();
@@ -46,21 +46,10 @@ public class ServerListManagerTest {
     @Test
     public void testGetter() throws NacosException {
         {
-            final ServerListManager mgr = new ServerListManager();
-            Assert.assertEquals("nacos", mgr.getContentPath());
-            Assert.assertEquals("default", mgr.getName());
-            Assert.assertEquals("", mgr.getTenant());
-            Assert.assertEquals("", mgr.getNamespace());
-            Assert.assertEquals("1.1.1.1-2.2.2.2_8848", mgr.getFixedNameSuffix("http://1.1.1.1", "2.2.2.2:8848"));
-        }
-        
-        {
             Properties properties = new Properties();
             properties.put(PropertyKeyConst.CONTEXT_PATH, "aaa");
             properties.put(PropertyKeyConst.ENDPOINT, "endpoint");
-    
-            final NacosClientProperties nacosClientProperties = NacosClientProperties.PROTOTYPE.derive(properties);
-            final ServerListManager mgr2 = new ServerListManager(nacosClientProperties);
+            final ServerListManager mgr2 = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties));
             Assert.assertEquals("aaa", mgr2.getContentPath());
         }
 
@@ -69,23 +58,20 @@ public class ServerListManagerTest {
             Properties properties = new Properties();
             properties.put(PropertyKeyConst.CONTEXT_PATH, "aaa");
             properties.put(PropertyKeyConst.SERVER_ADDR, "https://1.1.1.1:8848");
-            final NacosClientProperties nacosClientProperties = NacosClientProperties.PROTOTYPE.derive(properties);
-            final ServerListManager mgr2 = new ServerListManager(nacosClientProperties);
+            final ServerListManager mgr2 = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties));
             Assert.assertEquals("aaa", mgr2.getContentPath());
-            Assert.assertEquals("[https://1.1.1.1:8848]", mgr2.getServerUrls().toString());
+            Assert.assertEquals("[https://1.1.1.1:8848]", mgr2.getUrlString());
         }
         
         {
             Properties properties2 = new Properties();
             properties2.put(PropertyKeyConst.CONTEXT_PATH, "aaa");
             properties2.put(PropertyKeyConst.SERVER_ADDR, "1.1.1.1:8848");
-    
-            final NacosClientProperties nacosClientProperties = NacosClientProperties.PROTOTYPE.derive(properties2);
-            final ServerListManager mgr3 = new ServerListManager(nacosClientProperties);
-            Assert.assertEquals(1, mgr3.getServerUrls().size());
-            Assert.assertEquals("http://1.1.1.1:8848", mgr3.getServerUrls().get(0));
+            
+            final ServerListManager mgr3 = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties2));
+            Assert.assertEquals(1, mgr3.getServerList().size());
+            Assert.assertEquals("http://1.1.1.1:8848", mgr3.getServerList().get(0));
             Assert.assertEquals("[http://1.1.1.1:8848]", mgr3.getUrlString());
-            Assert.assertTrue(mgr3.contain("http://1.1.1.1:8848"));
             Assert.assertEquals("ServerManager-fixed-1.1.1.1_8848-[http://1.1.1.1:8848]", mgr3.toString());
         }
 
@@ -93,13 +79,11 @@ public class ServerListManagerTest {
             Properties properties3 = new Properties();
             properties3.put(PropertyKeyConst.CONTEXT_PATH, "aaa");
             properties3.put(PropertyKeyConst.SERVER_ADDR, "1.1.1.1:8848,2.2.2.2:8848");
-    
-            final NacosClientProperties nacosClientProperties = NacosClientProperties.PROTOTYPE.derive(properties3);
-            final ServerListManager mgr4 = new ServerListManager(nacosClientProperties);
-            Assert.assertEquals(2, mgr4.getServerUrls().size());
-            Assert.assertEquals("http://1.1.1.1:8848", mgr4.getServerUrls().get(0));
-            Assert.assertEquals("http://2.2.2.2:8848", mgr4.getServerUrls().get(1));
-            Assert.assertTrue(mgr4.contain("http://1.1.1.1:8848"));
+
+            final ServerListManager mgr4 = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties3));
+            Assert.assertEquals(2, mgr4.getServerList().size());
+            Assert.assertEquals("http://1.1.1.1:8848", mgr4.getServerList().get(0));
+            Assert.assertEquals("http://2.2.2.2:8848", mgr4.getServerList().get(1));
             Assert.assertEquals("ServerManager-fixed-1.1.1.1_8848-2.2.2.2_8848-[http://1.1.1.1:8848, http://2.2.2.2:8848]", mgr4.toString());
         }
 
@@ -107,43 +91,23 @@ public class ServerListManagerTest {
             Properties properties4 = new Properties();
             properties4.put(PropertyKeyConst.CONTEXT_PATH, "aaa");
             properties4.put(PropertyKeyConst.SERVER_ADDR, "1.1.1.1:8848;2.2.2.2:8848");
-    
-            final NacosClientProperties nacosClientProperties = NacosClientProperties.PROTOTYPE.derive(properties4);
-            final ServerListManager mgr5 = new ServerListManager(nacosClientProperties);
-            Assert.assertEquals(2, mgr5.getServerUrls().size());
-            Assert.assertEquals("http://1.1.1.1:8848", mgr5.getServerUrls().get(0));
-            Assert.assertEquals("http://2.2.2.2:8848", mgr5.getServerUrls().get(1));
-            Assert.assertTrue(mgr5.contain("http://1.1.1.1:8848"));
+
+            final ServerListManager mgr5 = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties4));
+            Assert.assertEquals(2, mgr5.getServerList().size());
+            Assert.assertEquals("http://1.1.1.1:8848", mgr5.getServerList().get(0));
+            Assert.assertEquals("http://2.2.2.2:8848", mgr5.getServerList().get(1));
             Assert.assertEquals("ServerManager-fixed-1.1.1.1_8848-2.2.2.2_8848-[http://1.1.1.1:8848, http://2.2.2.2:8848]", mgr5.toString());
         }
         
     }
     
     @Test
-    public void testIterator() {
-        List<String> addrs = new ArrayList<>();
-        String addr = "1.1.1.1:8848";
-        addrs.add(addr);
-        final ServerListManager mgr = new ServerListManager(addrs, "aaa");
-        
-        // new iterator
-        final Iterator<String> it = mgr.iterator();
-        Assert.assertTrue(it.hasNext());
-        Assert.assertEquals(addr, it.next());
-        
-        Assert.assertNull(mgr.getIterator());
-        mgr.refreshCurrentServerAddr();
-        Assert.assertNotNull(mgr.getIterator());
-        
-        final String currentServerAddr = mgr.getCurrentServerAddr();
-        Assert.assertEquals(addr, currentServerAddr);
-        
-        final String nextServerAddr = mgr.getNextServerAddr();
-        Assert.assertEquals(addr, nextServerAddr);
-        
-        final Iterator<String> iterator1 = mgr.iterator();
-        Assert.assertTrue(iterator1.hasNext());
-        
+    public void testGetCurrentServer() throws NacosException {
+        Properties properties = new Properties();
+        properties.put(PropertyKeyConst.SERVER_ADDR, "127.0.0.1:8848");
+        final ServerListManager serverListManager = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties));
+        Assert.assertEquals("127.0.0.1:8848", serverListManager.getCurrentServer());
+        Assert.assertEquals("127.0.0.1:8848", serverListManager.getNextServer());
     }
     
 }

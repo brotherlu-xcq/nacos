@@ -103,7 +103,9 @@ public class NacosConfigServiceTest {
         response.setConfigType("bb");
         Mockito.when(mockWoker.getServerConfig(dataId, group, "", timeout, false)).thenReturn(response);
         final NacosClientProperties properties = NacosClientProperties.PROTOTYPE.derive(new Properties());
-        Mockito.when(mockWoker.getAgent()).thenReturn(new ConfigTransportClient(properties, new ServerListManager()) {
+        properties.setProperty("endpoint", "localhost");
+        properties.setProperty("endpointPort", "8080");
+        Mockito.when(mockWoker.getAgent()).thenReturn(new ConfigTransportClient(properties, new ServerListManager(properties)) {
             @Override
             public void startInternal() throws NacosException {
                 // NOOP

@@ -16,7 +16,6 @@
 
 package com.alibaba.nacos.client.naming.remote.http;
 
-import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.common.http.AbstractHttpClientFactory;
 import com.alibaba.nacos.common.http.HttpClientBeanHolder;
 import com.alibaba.nacos.common.http.HttpClientConfig;
@@ -70,7 +69,7 @@ public class NamingHttpClientManager implements Closeable {
     }
     
     @Override
-    public void shutdown() throws NacosException {
+    public void shutdown() {
         NAMING_LOGGER.warn("[NamingHttpClientManager] Start destroying NacosRestTemplate");
         try {
             HttpClientBeanHolder.shutdownNacostSyncRest(HTTP_CLIENT_FACTORY.getClass().getName());

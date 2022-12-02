@@ -37,12 +37,11 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.RemoteConstants;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.response.Response;
-import com.alibaba.nacos.client.env.NacosClientProperties;
-import com.alibaba.nacos.plugin.auth.api.RequestResource;
 import com.alibaba.nacos.client.config.common.GroupKey;
 import com.alibaba.nacos.client.config.filter.impl.ConfigFilterChainManager;
 import com.alibaba.nacos.client.config.filter.impl.ConfigResponse;
 import com.alibaba.nacos.client.config.utils.ContentUtils;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import com.alibaba.nacos.client.monitor.MetricsMonitor;
 import com.alibaba.nacos.client.naming.utils.CollectionUtils;
 import com.alibaba.nacos.client.utils.AppNameUtils;
@@ -65,6 +64,8 @@ import com.alibaba.nacos.common.utils.MD5Utils;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.common.utils.ThreadUtils;
 import com.alibaba.nacos.common.utils.VersionUtils;
+import com.alibaba.nacos.plugin.address.common.AddressProperties;
+import com.alibaba.nacos.plugin.auth.api.RequestResource;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
@@ -126,11 +127,11 @@ public class ClientWorker implements Closeable {
     private int taskPenaltyTime;
     
     private boolean enableRemoteSyncConfig = false;
-    
+
     private static final int MIN_THREAD_NUM = 2;
-    
+
     private static final int THREAD_MULTIPLE = 1;
-    
+
     /**
      * Add listeners for data.
      *
@@ -477,7 +478,8 @@ public class ClientWorker implements Closeable {
         metric.put("snapshotDir", LocalConfigInfoProcessor.LOCAL_SNAPSHOT_PATH);
         boolean isFixServer = agent.serverListManager.isFixed;
         metric.put("isFixedServer", isFixServer);
-        metric.put("addressUrl", agent.serverListManager.addressServerUrl);
+        metric.put("addressPluginName", agent.serverListManager.getAddressPluginName());
+        metric.put("addressUrl", AddressProperties.getProperty("addressServerUrl"));
         metric.put("serverUrls", agent.serverListManager.getUrlString());
         
         Map<ClientConfigMetricRequest.MetricsKey, Object> metricValues = getMetricsValue(metricsKeys);
@@ -661,20 +663,20 @@ public class ClientWorker implements Closeable {
             
             rpcClientInner.serverListFactory(new ServerListFactory() {
                 @Override
-                public String genNextServer() {
-                    return ConfigRpcTransportClient.super.serverListManager.getNextServerAddr();
+                public String getNextServer() {
+                    return ConfigRpcTransportClient.super.serverListManager.getNextServer();
                     
                 }
                 
                 @Override
                 public String getCurrentServer() {
-                    return ConfigRpcTransportClient.super.serverListManager.getCurrentServerAddr();
+                    return ConfigRpcTransportClient.super.serverListManager.getCurrentServer();
                     
                 }
                 
                 @Override
                 public List<String> getServerList() {
-                    return ConfigRpcTransportClient.super.serverListManager.getServerUrls();
+                    return ConfigRpcTransportClient.super.serverListManager.getServerList();
                     
                 }
             });

@@ -19,6 +19,7 @@ package com.alibaba.nacos.client.config.http;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.client.config.impl.ServerListManager;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -29,23 +30,28 @@ public class ServerHttpAgentTest {
     
     @Test
     public void testConstruct() throws NacosException {
-        ServerListManager server = new ServerListManager();
+        Properties properties = new Properties();
+        properties.setProperty("endpoint", "aaa");
+        ServerListManager server = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties));
         final ServerHttpAgent serverHttpAgent1 = new ServerHttpAgent(server);
         Assert.assertNotNull(serverHttpAgent1);
         
         final ServerHttpAgent serverHttpAgent2 = new ServerHttpAgent(server, new Properties());
         Assert.assertNotNull(serverHttpAgent2);
         
-        final Properties properties = new Properties();
+        final Properties properties2 = new Properties();
         properties.put(PropertyKeyConst.SERVER_ADDR, "1.1.1.1");
-        final ServerHttpAgent serverHttpAgent3 = new ServerHttpAgent(properties);
+        final ServerHttpAgent serverHttpAgent3 = new ServerHttpAgent(properties2);
         Assert.assertNotNull(serverHttpAgent3);
         
     }
     
     @Test
     public void testGetterAndSetter() throws NacosException {
-        ServerListManager server = new ServerListManager("aaa", "namespace1");
+        Properties properties = new Properties();
+        properties.setProperty("endpoint", "aaa");
+        properties.setProperty("namespace", "namespace1");
+        ServerListManager server = new ServerListManager(NacosClientProperties.PROTOTYPE.derive(properties));
         final ServerHttpAgent serverHttpAgent = new ServerHttpAgent(server, new Properties());
         
         final String appname = ServerHttpAgent.getAppname();

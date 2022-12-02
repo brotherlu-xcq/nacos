@@ -84,7 +84,7 @@ public class NacosClusterControllerV2 {
         }
         return Result.success(nacosClusterOperationService.listNodes(address, nodeState));
     }
-    
+
     @GetMapping(value = "/node/self/health")
     public Result<String> selfHealth() {
         return Result.success(nacosClusterOperationService.selfHealth());
