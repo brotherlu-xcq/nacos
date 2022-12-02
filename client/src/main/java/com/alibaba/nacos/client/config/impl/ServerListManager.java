@@ -73,7 +73,7 @@ public class ServerListManager extends AbstractServerListManager implements Clos
             if (pluginName.equals("PropertyAddressPlugin")) {
                 serverName = DEFAULT_PLUGIN + "-" + getAddressPluginName()
                         + (StringUtils.isNotBlank(namespace) ? StringUtils.trim(namespace)
-                        : "") + "-" + getFixedNameSuffix(getServerList().toArray(new String[getServerList().size()]));
+                        : "") + "-" + getFixedNameSuffix(getServerList().toArray(new String[0]));
             } else if (pluginName.equals("EndpointAddressPlugin")) {
                 serverName = DEFAULT_PLUGIN + "-" + getAddressPluginName()
                         + (StringUtils.isNotBlank(namespace) ? ("_" + StringUtils.trim(namespace)) : "");
@@ -83,8 +83,8 @@ public class ServerListManager extends AbstractServerListManager implements Clos
             }
         }
 
-        serverName.replaceAll("\\/", "_");
-        serverName.replaceAll("\\:", "_");
+        serverName = serverName.replaceAll("\\/", "_");
+        serverName = serverName.replaceAll("\\:", "_");
         this.name = serverName;
     }
     

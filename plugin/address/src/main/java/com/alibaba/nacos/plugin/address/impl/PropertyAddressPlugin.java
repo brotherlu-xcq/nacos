@@ -21,7 +21,12 @@ import com.alibaba.nacos.plugin.address.common.AddressProperties;
 import com.alibaba.nacos.plugin.address.exception.AddressException;
 import com.alibaba.nacos.plugin.address.spi.AbstractAddressPlugin;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
+import static com.alibaba.nacos.common.constant.RequestUrlConstants.HTTPS_PREFIX;
+import static com.alibaba.nacos.common.constant.RequestUrlConstants.HTTP_PREFIX;
 
 /**
  * Get nacos server list by addressProperties
@@ -34,15 +39,26 @@ public class PropertyAddressPlugin extends AbstractAddressPlugin {
     private static final String SERVER_ADDRESS_STR = "serverAddressStr";
     
     private static final String PLUGIN_NAME = "property-address-plugin";
-    
+
     @Override
     public void start() throws AddressException {
-        String serverAddressStr = AddressProperties.getProperty(SERVER_ADDRESS_STR);
-        if (StringUtils.isEmpty(serverAddressStr)) {
+        String serverAddrsStr = AddressProperties.getProperty(SERVER_ADDRESS_STR);
+        if (StringUtils.isEmpty(serverAddrsStr)) {
             throw new AddressException("Param addressStr is empty");
         }
+
+        StringTokenizer serverAddrsTokens = new StringTokenizer(serverAddrsStr, ",;");
+        List<String> serverAddrs = new ArrayList<>();
+        while (serverAddrsTokens.hasMoreTokens()) {
+            String serverAddr = serverAddrsTokens.nextToken().trim();
+            if (serverAddr.startsWith(HTTP_PREFIX) || serverAddr.startsWith(HTTPS_PREFIX)) {
+                serverAddrs.add(serverAddr);
+                continue;
+            }
+            serverAddrs.add(HTTP_PREFIX + serverAddr);
+        }
         
-        this.serverList = Arrays.asList(serverAddressStr.split(","));
+        this.serverList = serverAddrs;
     }
     
     @Override

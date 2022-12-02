@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.plugin.address.common;
 
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -34,5 +35,9 @@ public class AddressProperties {
     
     public static String getProperty(String key) {
         return properties.getProperty(key);
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        return Optional.ofNullable(getProperty(key)).orElse(defaultValue);
     }
 }
