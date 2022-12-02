@@ -20,11 +20,14 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.client.address.AbstractServerListManager;
 import com.alibaba.nacos.client.env.NacosClientProperties;
 import com.alibaba.nacos.client.naming.event.ServerListChangedEvent;
+import com.alibaba.nacos.client.naming.remote.http.NamingHttpClientManager;
 import com.alibaba.nacos.common.lifecycle.Closeable;
 import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.remote.client.ServerListFactory;
 import com.alibaba.nacos.plugin.address.common.AddressProperties;
 import com.alibaba.nacos.plugin.address.exception.AddressException;
+
+import static com.alibaba.nacos.client.utils.LogUtils.NAMING_LOGGER;
 
 /**
  * the server list manager work in config.
@@ -32,9 +35,7 @@ import com.alibaba.nacos.plugin.address.exception.AddressException;
  * @author GuoJiangFu
  */
 public class ServerListManager extends AbstractServerListManager implements ServerListFactory, Closeable {
-    
-    private final String namespace;
-    
+
     private static final String PROPERTY_ADDRESS_PLUGIN = "PropertyAddressPlugin";
     
     public ServerListManager(NacosClientProperties properties) throws NacosException {
@@ -43,7 +44,6 @@ public class ServerListManager extends AbstractServerListManager implements Serv
 
     public ServerListManager(NacosClientProperties properties, String namespace) throws NacosException {
         super(properties);
-        this.namespace = namespace;
         if (namespace != null) {
             AddressProperties.setProperties("namespace", namespace);
         }
@@ -65,5 +65,14 @@ public class ServerListManager extends AbstractServerListManager implements Serv
         addressPlugin.registerListener(serverLists -> {
             NotifyCenter.publishEvent(new ServerListChangedEvent());
         });
+    }
+
+    @Override
+    public void shutdown() {
+        String className = this.getClass().getName();
+        NAMING_LOGGER.info("{} do shutdown begin", className);
+        super.shutdown();
+        NamingHttpClientManager.getInstance().shutdown();
+        NAMING_LOGGER.info("{} do shutdown stop", className);
     }
 }

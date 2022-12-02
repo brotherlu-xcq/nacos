@@ -43,9 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AbstractServerListManager implements ServerListManager {
     
     private final AtomicInteger currentIndex = new AtomicInteger();
-    
-    private String currentServer;
-    
+
     protected AddressPlugin addressPlugin;
     
     private static final String PROPERTY_ADDRESS_PLUGIN = "property-address-plugin";
@@ -79,8 +77,7 @@ public abstract class AbstractServerListManager implements ServerListManager {
     
     @Override
     public String getCurrentServer() {
-        currentServer = getServerList().get(currentIndex.get() % getServerList().size());
-        return currentServer;
+        return getServerList().get(currentIndex.get() % getServerList().size());
     }
     
     @Override
@@ -137,12 +134,11 @@ public abstract class AbstractServerListManager implements ServerListManager {
         String namespace = properties.getProperty(PropertyKeyConst.NAMESPACE);
         boolean hasQueryString = false;
         if (StringUtils.isNotBlank(namespace)) {
-            addressServerUrl.append("?namespace=" + namespace);
+            addressServerUrl.append("?namespace=").append(namespace);
             hasQueryString = true;
         }
         if (properties.containsKey(PropertyKeyConst.ENDPOINT_QUERY_PARAMS)) {
-            addressServerUrl
-                    .append(hasQueryString ? "&" : "?" + properties.getProperty(PropertyKeyConst.ENDPOINT_QUERY_PARAMS));
+            addressServerUrl.append(hasQueryString ? "&" : "?" + properties.getProperty(PropertyKeyConst.ENDPOINT_QUERY_PARAMS));
             
         }
         return addressServerUrl.toString();
