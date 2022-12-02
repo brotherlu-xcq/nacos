@@ -26,6 +26,11 @@ import com.alibaba.nacos.common.remote.client.ServerListFactory;
 import com.alibaba.nacos.plugin.address.common.AddressProperties;
 import com.alibaba.nacos.plugin.address.exception.AddressException;
 
+/**
+ * the server list manager work in config.
+ * fixme logic compare
+ * @author GuoJiangFu
+ */
 public class ServerListManager extends AbstractServerListManager implements ServerListFactory, Closeable {
     
     private final String namespace;
@@ -45,7 +50,7 @@ public class ServerListManager extends AbstractServerListManager implements Serv
     }
     
     public boolean isDomain() {
-        return this.addressPlugin.getPluginName().equals(PROPERTY_ADDRESS_PLUGIN) && this.getServerList().size() == 1;
+        return PROPERTY_ADDRESS_PLUGIN.equals(this.addressPlugin.getPluginName()) && this.getServerList().size() == 1;
     }
     
     public String getNacosDomain() {

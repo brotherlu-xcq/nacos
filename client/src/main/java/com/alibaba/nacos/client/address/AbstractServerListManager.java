@@ -197,7 +197,12 @@ public abstract class AbstractServerListManager implements ServerListManager {
         }
         
     }
-    
+
+    /**
+     * register the listener to address plugin.
+     *
+     * @throws AddressException register failed error.
+     */
     protected abstract void initAddressPluginListener() throws AddressException;
     
 }

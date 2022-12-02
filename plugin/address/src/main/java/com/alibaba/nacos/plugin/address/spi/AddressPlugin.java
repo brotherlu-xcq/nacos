@@ -33,24 +33,31 @@ public interface AddressPlugin {
     
     /**
      * Start address plugin.
+     *
+     * @throws NacosException start failed error.
      */
     void start() throws NacosException;
     
     /**
      * Get nacos server list.
      *
-     *@return: nacos server list.
+     *@return nacos server list.
      */
     List<String> getServerList();
     
     /**
      * Get address plugin name.
+     *
+     * @return plugin name.
      */
     String getPluginName();
     
     /**
      * When nacos server list change, then call address listener.
-     *@Param: address listener.
+     *
+     * @param addressListener address listeners.
+     * @return the address plugin.
+     * @throws  AddressException register failed error.
      */
     AddressPlugin registerListener(Consumer<List<String>> addressListener) throws AddressException;
     
@@ -62,7 +69,7 @@ public interface AddressPlugin {
     /**
      * Return some plugin info, default empty.
      *
-     *@return: plugin info.
+     * @return plugin info.
      */
     default Map<String, Object> info() {
         return Collections.emptyMap();

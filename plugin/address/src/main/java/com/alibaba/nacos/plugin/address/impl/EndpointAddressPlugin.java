@@ -119,6 +119,7 @@ public class EndpointAddressPlugin extends AbstractAddressPlugin {
     private List<String> getServerListFromEndpoint() {
         
         try {
+            // fixme the logic is not same with before.
             RestResult<String> restResult = restTemplate
                     .get(addressServerUrl, Header.EMPTY, Query.EMPTY, String.class);
             if (!restResult.ok()) {

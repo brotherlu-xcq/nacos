@@ -28,7 +28,7 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractAddressPlugin implements AddressPlugin {
     
-    protected List<String> serverList;
+    protected volatile List<String> serverList;
     
     protected Consumer<List<String>> addressListener;
     

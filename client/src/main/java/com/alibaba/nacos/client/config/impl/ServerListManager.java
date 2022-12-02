@@ -25,6 +25,11 @@ import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.plugin.address.exception.AddressException;
 
+/**
+ * the server list manager work in config.
+ *  fixme logic compare
+ * @author GuoJiangFu
+ */
 public class ServerListManager extends AbstractServerListManager implements Closeable {
     
     private String namespace = "";
@@ -50,7 +55,7 @@ public class ServerListManager extends AbstractServerListManager implements Clos
     }
 
     private void initParam(NacosClientProperties properties) {
-        this.isFixed = this.addressPlugin.getPluginName().equals(PROPERTY_ADDRESS_PLUGIN_NAME);
+        this.isFixed = PROPERTY_ADDRESS_PLUGIN_NAME.equals(this.addressPlugin.getPluginName());
         String contentPathTemp = properties.getProperty(PropertyKeyConst.CONTEXT_PATH);
         if (!StringUtils.isBlank(contentPathTemp)) {
             this.contentPath = contentPathTemp;
@@ -69,14 +74,10 @@ public class ServerListManager extends AbstractServerListManager implements Clos
         if (properties != null && properties.containsKey(PropertyKeyConst.SERVER_NAME)) {
             serverName = properties.getProperty(PropertyKeyConst.SERVER_NAME);
         } else {
-            String pluginName = getAddressPluginName();
-            if (pluginName.equals("PropertyAddressPlugin")) {
+            if (isFixed) {
                 serverName = DEFAULT_PLUGIN + "-" + getAddressPluginName()
                         + (StringUtils.isNotBlank(namespace) ? StringUtils.trim(namespace)
                         : "") + "-" + getFixedNameSuffix(getServerList().toArray(new String[0]));
-            } else if (pluginName.equals("EndpointAddressPlugin")) {
-                serverName = DEFAULT_PLUGIN + "-" + getAddressPluginName()
-                        + (StringUtils.isNotBlank(namespace) ? ("_" + StringUtils.trim(namespace)) : "");
             } else {
                 serverName = CUSTOM_PLUGIN + "-" + getAddressPluginName()
                         + (StringUtils.isNotBlank(namespace) ? ("_" + StringUtils.trim(namespace)) : "");
