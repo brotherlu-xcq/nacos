@@ -26,8 +26,6 @@ import com.alibaba.nacos.common.remote.client.ServerListFactory;
 import com.alibaba.nacos.plugin.address.common.AddressProperties;
 import com.alibaba.nacos.plugin.address.exception.AddressException;
 
-import java.util.Properties;
-
 public class ServerListManager extends AbstractServerListManager implements ServerListFactory, Closeable {
     
     private final String namespace;

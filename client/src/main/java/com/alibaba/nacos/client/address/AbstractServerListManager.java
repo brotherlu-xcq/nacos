@@ -32,7 +32,6 @@ import com.alibaba.nacos.plugin.address.spi.AddressPluginManager;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
