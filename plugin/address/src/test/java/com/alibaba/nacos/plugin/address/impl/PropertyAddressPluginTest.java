@@ -17,6 +17,8 @@
 package com.alibaba.nacos.plugin.address.impl;
 
 import com.alibaba.nacos.plugin.address.common.AddressProperties;
+import com.alibaba.nacos.plugin.address.exception.AddressException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,17 +36,23 @@ public class PropertyAddressPluginTest {
     private PropertyAddressPlugin propertyAddressPlugin;
     
     @Before
-    public void setUp() {
+    public void setUp() throws AddressException {
         propertyAddressPlugin = new PropertyAddressPlugin();
-        AddressProperties.setProperties("serverAddressStr", "localhost:8080, localhost:8081");
+        AddressProperties.setProperties("serverAddressStr", "localhost:8080, http://localhost:8081");
+        propertyAddressPlugin.start();
+    }
+
+    @After
+    public void tearDown() {
+        propertyAddressPlugin.shutdown();
     }
     
     @Test
     public void testGetServerList() {
         List<String> serverList = propertyAddressPlugin.getServerList();
         assertEquals(2, serverList.size());
-        assertEquals("localhost:8080", serverList.get(0));
-        assertEquals("localhost:8081", serverList.get(1));
+        assertEquals("http://localhost:8080", serverList.get(0));
+        assertEquals("http://localhost:8081", serverList.get(1));
     }
     
     @Test
